@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script src="gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flotti — La economía de la cuota diaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0f;
+    --bg-alt:#0e0e15;
+    --card-bg:rgba(255,255,255,0.05);
+    --card-border:rgba(255,255,255,0.10);
+    --text:#ffffff;
+    --body:#cbd5e1;
+    --secondary:#94a3b8;
+    --muted:#64748b;
+    --accent:#818cf8;
+    --chip-bg:rgba(99,102,241,0.15);
+    --chip-text:#a5b4fc;
+    --btn:#4f46e5;
+    --btn-hover:#6366f1;
+    --green:#34d399;
+    --green-light:#6ee7b7;
+    --green-bg:rgba(16,185,129,0.10);
+    --green-border:rgba(16,185,129,0.25);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--body);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.num,.big-num{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    color:var(--text);
+    margin:0;
+  }
+  .container{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  section{
+    padding:clamp(58px,7vw,96px) 0;
+  }
+  section.alt{
+    background:var(--bg-alt);
+    border-top:1px solid rgba(255,255,255,0.05);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .eyebrow{
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-weight:600;
+    font-size:0.82rem;
+    margin-bottom:14px;
+  }
+  h2{
+    font-weight:700;
+    font-size:clamp(1.6rem,3.5vw,2.4rem);
+    margin-bottom:18px;
+    letter-spacing:-0.01em;
+  }
+  .lead{
+    color:var(--body);
+    max-width:700px;
+    font-size:clamp(1rem,1.3vw,1.08rem);
+    line-height:1.65;
+    margin-bottom:44px;
+  }
+  a{color:inherit;}
+
+  /* ---------- NAV ---------- */
+  nav.topnav{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(10,10,15,0.75);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner{
+    max-width:1120px;
+    margin:0 auto;
+    padding:14px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    background:linear-gradient(135deg,#6366f1,#a855f7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:800;
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-size:16px;
+    flex-shrink:0;
+  }
+  .brand-word{
+    color:var(--text);
+    font-weight:700;
+    font-size:1.05rem;
+    letter-spacing:-0.01em;
+  }
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .nav-links a{
+    text-decoration:none;
+    color:var(--secondary);
+    font-size:0.92rem;
+    font-weight:500;
+    transition:color .2s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-toggle{
+    display:none;
+    background:none;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    color:var(--text);
+    font-size:1.2rem;
+    width:38px;
+    height:38px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  @media (max-width:980px){
+    .nav-links{
+      position:absolute;
+      top:100%;
+      left:0;
+      right:0;
+      background:#0a0a0f;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      flex-direction:column;
+      align-items:flex-start;
+      gap:0;
+      padding:8px 0;
+      display:none;
+    }
+    .nav-links.open{display:flex;}
+    .nav-links a{
+      width:100%;
+      padding:12px 24px;
+    }
+    .nav-toggle{display:flex;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:clamp(72px,10vw,120px) 0 clamp(58px,7vw,96px);
+    background-image:linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+    background-size:48px 48px;
+  }
+  .chip{
+    display:inline-block;
+    background:var(--chip-bg);
+    color:var(--chip-text);
+    padding:7px 16px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-weight:600;
+    letter-spacing:0.02em;
+    margin-bottom:28px;
+  }
+  .hero h1{
+    font-weight:800;
+    font-size:clamp(2.2rem,5.4vw,3.9rem);
+    line-height:1.16;
+    letter-spacing:-0.02em;
+    max-width:820px;
+    margin-bottom:26px;
+  }
+  .hero h1 .hl{
+    text-decoration:underline;
+    text-decoration-color:rgba(129,140,248,0.55);
+    text-decoration-thickness:4px;
+    text-underline-offset:8px;
+  }
+  .hero .lead{
+    font-size:clamp(1.02rem,1.4vw,1.2rem);
+    max-width:640px;
+    margin-bottom:0;
+  }
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1!important;transform:none!important;transition:none!important;}
+  }
+
+  /* ---------- generic cards ---------- */
+  .cards{
+    display:grid;
+    gap:24px;
+  }
+  .cards-2{grid-template-columns:repeat(2,1fr);}
+  .cards-3{grid-template-columns:repeat(3,1fr);}
+  .cards-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:820px){
+    .cards-2,.cards-3,.cards-4{grid-template-columns:1fr;}
+  }
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:28px;
+  }
+
+  /* ---------- segmento ---------- */
+  .num-card .num-tag{
+    font-size:2.4rem;
+    font-weight:800;
+    color:var(--accent);
+    display:block;
+    margin-bottom:10px;
+  }
+  .num-card h3{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-size:1.2rem;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:10px;
+  }
+  .num-card p{
+    color:var(--body);
+    margin:0;
+    font-size:0.96rem;
+    line-height:1.6;
+  }
+  .eje-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-top:36px;
+  }
+  .eje-chip{
+    padding:10px 22px;
+    border-radius:999px;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    color:var(--secondary);
+    font-weight:600;
+    font-size:0.92rem;
+  }
+
+  /* ---------- escala table ---------- */
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--card-border);
+    border-radius:16px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:640px;
+  }
+  thead th{
+    text-align:left;
+    padding:18px 22px;
+    color:var(--secondary);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-size:0.76rem;
+    font-weight:600;
+    border-bottom:1px solid var(--card-border);
+    background:rgba(255,255,255,0.02);
+  }
+  tbody td{
+    padding:22px;
+    border-bottom:1px solid var(--card-border);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.row-label{
+    font-weight:700;
+    color:var(--text);
+    white-space:nowrap;
+    font-size:1rem;
+  }
+  .cell-num{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--text);
+    display:block;
+    margin-bottom:8px;
+  }
+  .cell-ctx{
+    color:var(--body);
+    font-size:0.88rem;
+    line-height:1.5;
+    display:block;
+    margin-bottom:8px;
+  }
+  .cell-src{
+    color:var(--muted);
+    font-size:0.78rem;
+    display:block;
+  }
+
+  /* ---------- ajeno ---------- */
+  .stat-card{
+    text-align:center;
+  }
+  .stat-card .stat-num{
+    font-size:3rem;
+    font-weight:800;
+    color:var(--accent);
+    display:block;
+    margin-bottom:12px;
+  }
+  .stat-card .stat-country{
+    color:var(--text);
+    font-weight:700;
+    font-size:1rem;
+    margin-bottom:10px;
+  }
+  .stat-card .stat-label{
+    color:var(--secondary);
+    font-size:0.92rem;
+    line-height:1.5;
+  }
+  .shared-src{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.82rem;
+    margin-top:28px;
+  }
+
+  /* ---------- cuota (centerpiece) ---------- */
+  #cuota{
+    background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.10), transparent 70%), var(--bg);
+  }
+  .cuota-card{
+    background:var(--card-bg);
+    border:1px solid rgba(129,140,248,0.22);
+    border-radius:18px;
+    padding:32px 26px;
+    text-align:left;
+  }
+  .cuota-name{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-weight:800;
+    font-size:1.55rem;
+    color:var(--accent);
+    margin-bottom:16px;
+    display:block;
+  }
+  .cuota-amount{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-weight:800;
+    font-size:1.7rem;
+    color:var(--text);
+    display:block;
+    margin-bottom:6px;
+  }
+  .cuota-sub{
+    color:var(--secondary);
+    font-size:0.85rem;
+    display:block;
+    margin-bottom:16px;
+  }
+  .cuota-desc{
+    color:var(--body);
+    font-size:0.92rem;
+    line-height:1.55;
+    margin:0;
+  }
+  .cuota-highlight{
+    margin-top:40px;
+    text-align:center;
+    padding:26px 32px;
+    border-radius:16px;
+    background:var(--chip-bg);
+    border:1px solid rgba(129,140,248,0.3);
+    color:var(--text);
+    font-weight:700;
+    font-size:clamp(1.05rem,1.8vw,1.3rem);
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+  }
+
+  /* ---------- industria ---------- */
+  .ind-card{text-align:left;}
+  .ind-card .big-num{
+    font-size:2.6rem;
+    font-weight:800;
+    color:var(--text);
+    display:block;
+    margin-bottom:14px;
+  }
+  .ind-card p{
+    color:var(--body);
+    font-size:0.94rem;
+    line-height:1.6;
+    margin:0 0 14px 0;
+  }
+  .ind-card .cell-src{margin-bottom:0;}
+
+  /* ---------- competencia table ---------- */
+  .comp-table td, .comp-table th{vertical-align:middle;}
+  .comp-table td.prod{font-weight:700;color:var(--text);}
+  .comp-table td.resuelve{color:var(--body);font-size:0.92rem;line-height:1.55;}
+  .comp-table td.dir{color:var(--secondary);font-size:0.88rem;white-space:nowrap;}
+  .comp-table tr.flotti-row td{
+    background:rgba(99,102,241,0.12);
+  }
+  .comp-table tr.flotti-row td.prod{color:var(--text);}
+  .comp-table tr.flotti-row td.dir{color:var(--accent);font-weight:700;}
+
+  /* ---------- producto ---------- */
+  .producto-grid{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:48px;
+    align-items:start;
+  }
+  @media (max-width:820px){
+    .producto-grid{grid-template-columns:1fr;}
+  }
+  .phone{
+    width:320px;
+    max-width:100%;
+    background:#05050a;
+    border-radius:32px;
+    padding:10px;
+    margin:0 auto;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .phone-header{
+    background:#151b2e;
+    border-radius:22px 22px 0 0;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .phone-avatar{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#6366f1,#a855f7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:800;
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    flex-shrink:0;
+  }
+  .phone-title{display:flex;flex-direction:column;}
+  .phone-title .name{color:#fff;font-weight:700;font-size:0.9rem;}
+  .phone-title .status{color:#a5b4fc;font-size:0.72rem;}
+  .phone-body{
+    background:#0a0a0f;
+    border-radius:0 0 22px 22px;
+    min-height:400px;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    padding:14px 12px;
+  }
+  .bub{
+    max-width:85%;
+    padding:9px 12px;
+    border-radius:14px;
+    font-size:13px;
+    line-height:1.4;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .bub.show{opacity:1;transform:translateY(0);}
+  .bub.bot{
+    background:#1b2136;
+    color:#e2e8f0;
+    align-self:flex-start;
+    border-bottom-left-radius:4px;
+  }
+  .bub.user{
+    background:#4338ca;
+    color:#eef2ff;
+    align-self:flex-end;
+    border-bottom-right-radius:4px;
+  }
+  .bub .pill{
+    display:inline-block;
+    margin-top:8px;
+    padding:5px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.12);
+    font-size:11.5px;
+    font-weight:600;
+  }
+  .bub .doc{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .sys{
+    align-self:center;
+    text-align:center;
+    background:rgba(99,102,241,0.10);
+    color:#a5b4fc;
+    font-size:11.5px;
+    padding:6px 14px;
+    border-radius:999px;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .35s ease, transform .35s ease;
+    max-width:90%;
+  }
+  .sys.show{opacity:1;transform:translateY(0);}
+
+  .beats{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .beat{
+    padding:16px 18px;
+    border-radius:14px;
+    border:1px solid transparent;
+    transition:background .3s ease, border-color .3s ease;
+  }
+  .beat.active{
+    background:var(--chip-bg);
+    border-color:rgba(129,140,248,0.3);
+  }
+  .beat h3{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-size:1.02rem;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .beat p{
+    color:var(--secondary);
+    font-size:0.9rem;
+    line-height:1.5;
+    margin:0;
+  }
+  .outcome-box{
+    margin-top:14px;
+    padding:16px 18px;
+    border-radius:14px;
+    background:var(--green-bg);
+    border:1px solid var(--green-border);
+    color:var(--green-light);
+    font-weight:600;
+    font-size:0.94rem;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .outcome-box.show{opacity:1;transform:translateY(0);}
+  .producto-note{
+    color:var(--muted);
+    font-size:0.82rem;
+    margin-top:18px;
+  }
+
+  /* ---------- data ---------- */
+  .lead .accent-strong{
+    color:var(--accent);
+    font-weight:600;
+  }
+  .data-card h3{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:10px;
+  }
+  .data-card p{
+    color:var(--body);
+    font-size:0.9rem;
+    line-height:1.55;
+    margin:0;
+  }
+  .callout{
+    margin-top:40px;
+    padding:28px 32px;
+    border-radius:16px;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-left:4px solid var(--accent);
+  }
+  .callout h3{
+    font-family:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+    font-weight:700;
+    font-size:1.2rem;
+    color:var(--text);
+    margin-bottom:14px;
+  }
+  .callout p{
+    color:var(--body);
+    font-size:0.96rem;
+    line-height:1.65;
+    margin:0;
+  }
+
+  /* ---------- final CTA ---------- */
+  .final-cta{
+    background:linear-gradient(135deg,#1e1b4b,#4338ca 55%,#7e22ce);
+    text-align:center;
+    padding:clamp(64px,9vw,110px) 24px;
+  }
+  .final-cta h2{
+    color:#fff;
+    max-width:760px;
+    margin:0 auto 20px;
+  }
+  .final-cta p{
+    color:rgba(255,255,255,0.85);
+    max-width:600px;
+    margin:0 auto 36px;
+    font-size:1.05rem;
+    line-height:1.6;
+  }
+  .cta-buttons{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    display:inline-block;
+    padding:14px 30px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:0.96rem;
+    text-decoration:none;
+    transition:background .2s ease, transform .2s ease, opacity .2s ease;
+  }
+  .btn-solid{
+    background:#fff;
+    color:#1e1b4b;
+  }
+  .btn-solid:hover{opacity:0.9;}
+  .btn-ghost{
+    background:transparent;
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.6);
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,0.1);}
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:32px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+    max-width:1120px;
+    margin:0 auto;
+    border-top:1px solid rgba(255,255,255,0.05);
+  }
+  footer .brand{margin:0;}
+  footer .foot-meta{
+    color:var(--muted);
+    font-size:0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<noscript><style>.reveal,.bub,.sys{opacity:1!important;transform:none!important}</style></noscript>
+
+<nav class="topnav">
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <span class="brand-mark">F</span>
+      <span class="brand-word">flotti</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">☰</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#segmento">El segmento</a></li>
+      <li><a href="#escala">La escala</a></li>
+      <li><a href="#cuota">La cuota</a></li>
+      <li><a href="#industria">Ya es industria</a></li>
+      <li><a href="#competencia">Competencia</a></li>
+      <li><a href="#producto">Cómo funciona</a></li>
+      <li><a href="#data">La data</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <span class="chip reveal in">Documento de análisis · Colombia · México · Brasil</span>
+    <h1 class="reveal in">Hay una economía de cuotas diarias<br><span class="hl">que todavía se cobra a mano</span></h1>
+    <p class="lead reveal in">Millones de conductores en América Latina manejan un vehículo que no es suyo y le pagan al dueño una cuota, todos los días. Ese cobro se hace por chat, comprobante por comprobante. Flotti es la infraestructura que lo cobra, lo verifica contra el banco y lo concilia solo.</p>
+  </div>
+</header>
+
+<!-- 2. SEGMENTO -->
+<section id="segmento" class="alt">
+  <div class="container">
+    <p class="eyebrow reveal">El segmento</p>
+    <h2 class="reveal">El que conduce no es el dueño, y paga por manejar</h2>
+    <p class="lead reveal">El filtro son dos condiciones a la vez, y las dos son obligatorias. El parque automotor total de un país es el denominador equivocado: la mayoría es alguien que compró su vehículo y lo maneja. Este segmento es otra cosa.</p>
+    <div class="cards cards-2">
+      <div class="card num-card reveal">
+        <span class="num-tag">01</span>
+        <h3>El que conduce no es el dueño</h3>
+        <p>El vehículo pertenece a un tercero: un dueño de flota, un inversionista, una empresa de renting.</p>
+      </div>
+      <div class="card num-card reveal">
+        <span class="num-tag">02</span>
+        <h3>Paga una cuota recurrente</h3>
+        <p>Diaria o semanal, no mensual. El ciclo de cobro no cierra nunca: apenas termina, vuelve a empezar.</p>
+      </div>
+    </div>
+    <div class="eje-row reveal">
+      <span class="eje-chip">Taxis</span>
+      <span class="eje-chip">Carros en plataformas</span>
+      <span class="eje-chip">Motos en delivery</span>
+    </div>
+  </div>
+</section>
+
+<!-- 3. ESCALA -->
+<section id="escala">
+  <div class="container">
+    <p class="eyebrow reveal">La escala</p>
+    <h2 class="reveal">Tres ejes, tres países, cifras nacionales</h2>
+    <p class="lead reveal">Ninguna cifra de esta tabla es de una ciudad. Todas son de país, de la fuente oficial o gremial de cada mercado.</p>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Colombia</th>
+            <th>México</th>
+            <th>Brasil</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Taxis</td>
+            <td>
+              <span class="cell-num">211 mil</span>
+              <span class="cell-ctx">taxis registrados a nivel nacional</span>
+              <span class="cell-src">RUNT · Andemos, 2020</span>
+            </td>
+            <td>
+              <span class="cell-num">~700 mil</span>
+              <span class="cell-ctx">automóviles de servicio público en circulación, categoría dominada por taxis</span>
+              <span class="cell-src">INEGI · Vehículos de Motor Registrados en Circulación</span>
+            </td>
+            <td>
+              <span class="cell-num">300 mil</span>
+              <span class="cell-ctx">taxistas cadastrados en el registro federal del auxílio-taxista</span>
+              <span class="cell-src">Governo Federal · Agência Brasil, 2022</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-label">Carros en plataformas</td>
+            <td>
+              <span class="cell-num">1,28 M</span>
+              <span class="cell-ctx">conductores generan ingreso en apps de transporte (Uber, DiDi, Cabify, inDrive)</span>
+              <span class="cell-src">Alianza In, 2026</span>
+            </td>
+            <td>
+              <span class="cell-num">658 mil</span>
+              <span class="cell-ctx">trabajadores de plataforma registrados (conductores y repartidores juntos)</span>
+              <span class="cell-src">SAT · Secretaría del Trabajo, 2024</span>
+            </td>
+            <td>
+              <span class="cell-num">~1 M</span>
+              <span class="cell-ctx">motoristas de aplicativo (rango 704 mil – 1 M según el estudio)</span>
+              <span class="cell-src">IBGE · IPEA · Unicamp</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-label">Motos en delivery</td>
+            <td>
+              <span class="cell-num">645 mil</span>
+              <span class="cell-ctx">cuentas de repartidor con al menos una entrega en 2024. El 73% se mueve en moto</span>
+              <span class="cell-src">Alianza In, 2026 · mix de vehículo: Rappi Colombia</span>
+            </td>
+            <td>
+              <span class="cell-num">—</span>
+              <span class="cell-ctx">sin desglose oficial: los repartidores están dentro del agregado de plataforma de la fila anterior</span>
+              <span class="cell-src">No publicado</span>
+            </td>
+            <td>
+              <span class="cell-num">760 mil</span>
+              <span class="cell-ctx">entregadores activos en 2024; 360 mil con actividad mensual</span>
+              <span class="cell-src">iFood, 2024 · IBGE: 485 mil repartidores</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 4. AJENO -->
+<section id="ajeno" class="alt">
+  <div class="container">
+    <p class="eyebrow reveal">Cuántos no son dueños</p>
+    <h2 class="reveal">Entre un tercio y la mitad maneja un vehículo ajeno</h2>
+    <p class="lead reveal">Es la misma encuesta aplicada en los tres países, así que las cifras se pueden comparar entre sí: 13.722 entrevistas a conductores de plataforma en ocho países de la región.</p>
+    <div class="cards cards-3">
+      <div class="card stat-card reveal">
+        <span class="stat-num">49%</span>
+        <div class="stat-country">Colombia</div>
+        <p class="stat-label">de los conductores de plataforma no maneja un vehículo propio</p>
+      </div>
+      <div class="card stat-card reveal">
+        <span class="stat-num">40%</span>
+        <div class="stat-country">México</div>
+        <p class="stat-label">de los conductores de plataforma no maneja un vehículo propio</p>
+      </div>
+      <div class="card stat-card reveal">
+        <span class="stat-num">36%</span>
+        <div class="stat-country">Brasil</div>
+        <p class="stat-label">de los conductores de plataforma no maneja un vehículo propio</p>
+      </div>
+    </div>
+    <p class="shared-src reveal">BID con Uber e Ipsos, 2024 · 13.722 entrevistas en 8 países</p>
+  </div>
+</section>
+
+<!-- 5. CUOTA — centerpiece -->
+<section id="cuota">
+  <div class="container">
+    <p class="eyebrow reveal">La cuota</p>
+    <h2 class="reveal">Mismo contrato, tres monedas, tres nombres propios</h2>
+    <p class="lead reveal">Nadie tuvo que inventar este mercado: ya tiene vocabulario en cada país. Cuando un contrato tiene nombre local en tres mercados distintos, es estructura, no anécdota.</p>
+    <div class="cards cards-4">
+      <div class="cuota-card reveal">
+        <span class="cuota-name">"El producido"</span>
+        <span class="cuota-amount">COP 80.000 – 100.000</span>
+        <span class="cuota-sub">por día · Bogotá</span>
+        <p class="cuota-desc">Lo que el taxista entrega al dueño del vehículo cada jornada</p>
+      </div>
+      <div class="cuota-card reveal">
+        <span class="cuota-name">"La cuenta"</span>
+        <span class="cuota-amount">MXN 250 – 350</span>
+        <span class="cuota-sub">por día · Ciudad de México</span>
+        <p class="cuota-desc">Pago fijo diario del chofer al concesionario del taxi</p>
+      </div>
+      <div class="cuota-card reveal">
+        <span class="cuota-name">"A diária"</span>
+        <span class="cuota-amount">R$ 60+</span>
+        <span class="cuota-sub">por día · São Paulo</span>
+        <p class="cuota-desc">Lo que el taxista paga a la frota por usar el vehículo</p>
+      </div>
+      <div class="cuota-card reveal">
+        <span class="cuota-name">Moto de delivery</span>
+        <span class="cuota-amount">R$ 18 – 31</span>
+        <span class="cuota-sub">por día · Brasil</span>
+        <p class="cuota-desc">Renta diaria de una moto para repartir, según plan</p>
+      </div>
+    </div>
+    <div class="cuota-highlight reveal">Tres países, tres monedas, un solo contrato: alguien entrega un vehículo y cobra por día.</div>
+  </div>
+</section>
+
+<!-- 6. INDUSTRIA -->
+<section id="industria" class="alt">
+  <div class="container">
+    <p class="eyebrow reveal">Ya es industria</p>
+    <h2 class="reveal">Cobrar esta cuota ya sostiene compañías de miles de millones</h2>
+    <p class="lead reveal">Ninguna de estas empresas vende software: son operadores. Hacen exactamente lo que hace el cliente de Flotti, a escala industrial. Su tamaño es la prueba de que el flujo existe y de que vale la pena cobrarlo bien.</p>
+    <div class="cards cards-3">
+      <div class="card ind-card reveal">
+        <span class="big-num">300.000</span>
+        <p>carros rentados a motoristas de aplicativo solo en Brasil. Creció 76,5% en tres años y ya es una quinta parte de toda la flota de alquiler del país</p>
+        <span class="cell-src">ABLA · Asociación Brasileña de Rentadoras, 2024</span>
+      </div>
+      <div class="card ind-card reveal">
+        <span class="big-num">BRL 1.000 M</span>
+        <p>de ingresos anuales de Mottu, cobrando la cuota diaria de más de 100.000 motos en Brasil y México</p>
+        <span class="cell-src">Mottu, abril 2025</span>
+      </div>
+      <div class="card ind-card reveal">
+        <span class="big-num">US$ 2.100 M</span>
+        <p>de valuación de Moove, que opera ~42.000 vehículos con conductores de plataforma. Uber invirtió US$100 millones</p>
+        <span class="cell-src">TechCrunch, agosto 2026</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. COMPETENCIA -->
+<section id="competencia">
+  <div class="container">
+    <p class="eyebrow reveal">Competencia</p>
+    <h2 class="reveal">Todos administran el gasto. Nadie cobra el ingreso.</h2>
+    <p class="lead reveal">La categoría de software de flotas está poblada, así que el espacio no está vacío por falta de demanda. Está vacío en una dirección: el software existente controla lo que la flota gasta y los pagos que van hacia el conductor. Cobrarle al conductor y verificar que el dinero llegó es la dirección opuesta.</p>
+    <div class="table-wrap reveal">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Qué resuelve</th>
+            <th>Dirección del dinero</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="prod">Software Mi Flota · Chile</td>
+            <td class="resuelve">El conductor carga gastos y combustible por mensajería; el dueño ve costo por kilómetro</td>
+            <td class="dir">↑ control de gasto</td>
+          </tr>
+          <tr>
+            <td class="prod">Mis Flotillas · México</td>
+            <td class="resuelve">Alertas, control de combustible, documentos, mantenimiento y presupuesto por unidad</td>
+            <td class="dir">↑ control de gasto</td>
+          </tr>
+          <tr>
+            <td class="prod">Uber Fleet</td>
+            <td class="resuelve">Estados de cuenta al administrador para revisar rendimiento y optimizar pagos a conductores</td>
+            <td class="dir">↓ pago al conductor</td>
+          </tr>
+          <tr>
+            <td class="prod">Drivvo</td>
+            <td class="resuelve">Gestión de vehículos y conductores, reportes por vehículo y período</td>
+            <td class="dir">↑ control de gasto</td>
+          </tr>
+          <tr>
+            <td class="prod">Getpulpo · España y México</td>
+            <td class="resuelve">Centraliza vehículos, conductores y documentación; automatiza reportes operativos</td>
+            <td class="dir">↑ control de gasto</td>
+          </tr>
+          <tr>
+            <td class="prod">Transportex</td>
+            <td class="resuelve">Gastos operativos, anticipos, sueldo base, bonos y viáticos a pagar al conductor</td>
+            <td class="dir">↓ pago al conductor</td>
+          </tr>
+          <tr class="flotti-row">
+            <td class="prod">Flotti</td>
+            <td class="resuelve">Cobra la cuota al conductor y la da por pagada solo cuando el banco del dueño confirma que el dinero entró</td>
+            <td class="dir">↑ cobro verificado</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 8. PRODUCTO -->
+<section id="producto" class="alt">
+  <div class="container">
+    <p class="eyebrow reveal">Cómo funciona</p>
+    <h2 class="reveal">Todo comienza con una foto</h2>
+    <p class="lead reveal">Los conductores ya usan Telegram todos los días. Flotti opera sobre esa base: el conductor manda el comprobante por chat y el resto ocurre solo, hasta que el banco confirma.</p>
+    <div class="producto-grid">
+      <div class="phone reveal">
+        <div class="phone-header">
+          <span class="phone-avatar">F</span>
+          <div class="phone-title">
+            <span class="name">Flotti Bot</span>
+            <span class="status">bot · en línea</span>
+          </div>
+        </div>
+        <div class="phone-body" id="phoneBody"></div>
+      </div>
+      <div class="reveal">
+        <div class="beats" id="beats">
+          <div class="beat" data-beat="0">
+            <h3>Flotti pide el pago</h3>
+            <p>Un recordatorio con botón. El conductor no llena formularios.</p>
+          </div>
+          <div class="beat" data-beat="1">
+            <h3>El conductor envía el comprobante</h3>
+            <p>Directo al chat de Telegram, sin aplicaciones adicionales.</p>
+          </div>
+          <div class="beat" data-beat="2">
+            <h3>La IA extrae los datos</h3>
+            <p>Monto, hora y llave bancaria, verificados por consenso de tres lecturas.</p>
+          </div>
+          <div class="beat" data-beat="3">
+            <h3>El banco confirma</h3>
+            <p>El cruce con el correo real del banco aprueba el pago automáticamente.</p>
+          </div>
+          <div class="beat" data-beat="4">
+            <h3>La cuota queda conciliada</h3>
+            <p>Y si el pago sobra, el excedente pasa en cascada a la siguiente cuota.</p>
+          </div>
+        </div>
+        <div class="outcome-box" id="outcomeBox">✓ Un pago verificado y conciliado, sin revisar nada a mano.</div>
+        <p class="producto-note">Conciliación bancaria disponible hoy para bancos de Colombia. La arquitectura está lista para más países.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. DATA -->
+<section id="data">
+  <div class="container">
+    <p class="eyebrow reveal">El segundo acto</p>
+    <h2 class="reveal">Cada kilómetro leído es una orden de servicio que todavía no ocurrió</h2>
+    <p class="lead reveal">Para operar la cuota, Flotti ya le pide al conductor una foto del tablero. De ahí sale el kilometraje real de cada vehículo, y contra el plan de mantenimiento eso determina qué servicio y qué repuesto necesita cada unidad, y en qué fecha. <span class="accent-strong">Multiplicado por la base instalada, es la demanda de mantenimiento de una ciudad conocida antes de que ocurra.</span></p>
+    <div class="cards cards-4">
+      <div class="card data-card reveal">
+        <h3>Talleres</h3>
+        <p>Su problema es llenar la bahía, y el cliente les llega al azar. Recibir los vehículos de su zona que necesitan servicio en las próximas semanas es demanda calificada y con fecha.</p>
+      </div>
+      <div class="card data-card reveal">
+        <h3>Concesionarios</h3>
+        <p>El mismo problema en su taller de servicio, más el cliente de posgarantía que se les fuga. Y un vehículo de flota llega a fin de vida útil de forma predecible.</p>
+      </div>
+      <div class="card data-card reveal">
+        <h3>Distribuidores de repuestos</h3>
+        <p>Planeación de inventario sobre demanda real en vez de proyección histórica.</p>
+      </div>
+      <div class="card data-card reveal">
+        <h3>Aseguradoras</h3>
+        <p>El kilometraje real es el mejor predictor de riesgo, y acá se captura sin instalar ningún dispositivo. Es seguro por uso, sin el hardware del seguro por uso.</p>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <h3>No es venta de datos. Es agregación de demanda.</h3>
+      <p>El dueño de flota no entrega su información a cambio de nada: recibe un taller con precio negociado, porque Flotti agrupa la demanda de miles de vehículos y la lleva a la mesa. Eso convierte a la plataforma en un grupo de compra, no en un intermediario de datos, y captura una comisión sobre la transacción en vez de una tarifa por contacto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. FINAL CTA -->
+<section class="final-cta">
+  <h2>La cuota ya se cobra. Hoy se cobra a mano.</h2>
+  <p>Flotti es la capa que la cobra, la verifica contra el banco y la concilia sola, en cualquiera de los tres ejes y cualquiera de los tres países.</p>
+  <div class="cta-buttons">
+    <a class="btn btn-solid" href="mailto:info@flotti.io?subject=Flotti">Solicitar demo</a>
+    <a class="btn btn-ghost" href="https://flotti.io">Conocer Flotti</a>
+  </div>
+</section>
+
+<footer>
+  <a class="brand" href="#">
+    <span class="brand-mark">F</span>
+    <span class="brand-word">flotti</span>
+  </a>
+  <span class="foot-meta">Cobranza y mantenimiento para flotas · info@flotti.io · flotti.io</span>
+</footer>
+
+<script>
+  // Nav mobile toggle
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', function(){
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  // Scroll reveal
+  var reveals = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15});
+    reveals.forEach(function(el){ io.observe(el); });
+  } else {
+    reveals.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  // Phone chat animation
+  var phoneBody = document.getElementById('phoneBody');
+  var outcomeBox = document.getElementById('outcomeBox');
+  var beatEls = document.querySelectorAll('#beats .beat');
+
+  var steps = [
+    {type:'bot', beat:0, html:'Hola 👋 Tu cuota de esta semana ($850.000) vence mañana. Cuando pagues, envíame el comprobante por aquí.<span class="pill">Ver mi cuota</span>'},
+    {type:'user', beat:1, html:'<span class="doc">📄 comprobante.jpg</span>'},
+    {type:'sys', beat:2, html:'Flotti lee el comprobante: $850.000 · 3:42 p.m. · llave ****2841'},
+    {type:'sys', beat:3, html:'Cruce con el correo del banco: monto y hora coinciden'},
+    {type:'bot', beat:4, html:'✅ Cuota #12 confirmada. El excedente de $50.000 se aplicó a tu próxima cuota.'}
+  ];
+
+  var stepIndex = 0;
+  var STEP_INTERVAL = 1700;
+  var LOOP_PAUSE = 5200;
+
+  function setActiveBeat(i){
+    beatEls.forEach(function(b){ b.classList.remove('active'); });
+    if(i >= 0 && beatEls[i]){ beatEls[i].classList.add('active'); }
+  }
+
+  function resetPhone(){
+    phoneBody.innerHTML = '';
+    outcomeBox.classList.remove('show');
+    setActiveBeat(-1);
+    stepIndex = 0;
+  }
+
+  function playStep(){
+    if(stepIndex >= steps.length){
+      setTimeout(function(){
+        resetPhone();
+        setTimeout(playStep, 400);
+      }, LOOP_PAUSE);
+      return;
+    }
+    var step = steps[stepIndex];
+    var el = document.createElement('div');
+    if(step.type === 'sys'){
+      el.className = 'sys';
+    } else {
+      el.className = 'bub ' + step.type;
+    }
+    el.innerHTML = step.html;
+    phoneBody.appendChild(el);
+    setActiveBeat(step.beat);
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        el.classList.add('show');
+      });
+    });
+
+    if(stepIndex === steps.length - 1){
+      setTimeout(function(){
+        outcomeBox.classList.add('show');
+      }, 400);
+    }
+
+    stepIndex++;
+    setTimeout(playStep, STEP_INTERVAL);
+  }
+
+  playStep();
+</script>
+
+</body>
+</html>
